@@ -12,9 +12,12 @@ sealed class NavigationItem(
     val icon:ImageVector
 ) {
 
-    object Home:NavigationItem(R.string.navigation_item_main, Icons.Outlined.Home)
-    object Favourite:NavigationItem(R.string.navigation_item_favourite, Icons.Outlined.Favorite)
-    object Profile:NavigationItem(R.string.navigation_item_profile, Icons.Outlined.Person)
+    object Home:
+        NavigationItem(R.string.navigation_item_main, Icons.Outlined.Home)
+    object Favourite:
+        NavigationItem(R.string.navigation_item_favourite, Icons.Outlined.Favorite)
+    object Profile:
+        NavigationItem(R.string.navigation_item_profile, Icons.Outlined.Person)
 
 
 }
