@@ -29,7 +29,10 @@ import com.sumincourse.vknewsclient.domain.StatisticsType
 fun PostCard(
     modifier: Modifier = Modifier,
     feedPost: FeedPost,
-    onStatisticsItemClickListener: (StatisticItem) -> Unit
+    onLikeClickListener: (StatisticItem) -> Unit,
+    onShareClickListener: (StatisticItem) -> Unit,
+    onCommentClickListener: (StatisticItem) -> Unit,
+    onViewsClickListener: (StatisticItem) -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -50,7 +53,7 @@ fun PostCard(
                 contentScale = ContentScale.FillWidth
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Statistics(feedPost.statistics, onStatisticsItemClickListener)
+            Statistics(feedPost.statistics, onLikeClickListener, onShareClickListener, onCommentClickListener, onViewsClickListener)
         }
     }
 }
@@ -93,48 +96,51 @@ private fun PostHeader(feedPost: FeedPost) {
 @Composable
 private fun Statistics(
     statistics: List<StatisticItem>,
-    onItemClickListener: (StatisticItem) -> Unit
+    onLikeClickListener: (StatisticItem) -> Unit,
+    onShareClickListener: (StatisticItem) -> Unit,
+    onCommentClickListener: (StatisticItem) -> Unit,
+    onViewsClickListener: (StatisticItem) -> Unit,
 ) {
     Row {
         Row(
             modifier = Modifier.weight(1f)
         ) {
-            val viewsItem=statistics.getItemByType(StatisticsType.VIEWS)
+            val viewsItem = statistics.getItemByType(StatisticsType.VIEWS)
             IconWithText(
                 iconResId = R.drawable.ic_views_count,
                 text = viewsItem.count.toString(),
-                onItemClickListener ={ onItemClickListener(viewsItem)}
+                onItemClickListener = { onViewsClickListener(viewsItem) }
             )
         }
         Row(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            val sharesItem=statistics.getItemByType(StatisticsType.SHARES)
+            val sharesItem = statistics.getItemByType(StatisticsType.SHARES)
             IconWithText(
                 iconResId = R.drawable.ic_share,
                 text = sharesItem.count.toString(),
-                onItemClickListener ={ onItemClickListener(sharesItem)}
+                onItemClickListener = { onShareClickListener(sharesItem) }
             )
 
-            val commentsItem=statistics.getItemByType(StatisticsType.COMMENTS)
+            val commentsItem = statistics.getItemByType(StatisticsType.COMMENTS)
             IconWithText(
                 iconResId = R.drawable.ic_comment,
                 text = commentsItem.count.toString(),
-                onItemClickListener ={ onItemClickListener(commentsItem)}
+                onItemClickListener = { onCommentClickListener(commentsItem) }
             )
 
-            val likesItem=statistics.getItemByType(StatisticsType.LIKES)
+            val likesItem = statistics.getItemByType(StatisticsType.LIKES)
             IconWithText(
                 iconResId = R.drawable.ic_like,
                 text = likesItem.count.toString(),
-                onItemClickListener ={ onItemClickListener(likesItem)}
+                onItemClickListener = { onLikeClickListener(likesItem) }
             )
         }
     }
 }
 
-private fun List<StatisticItem>.getItemByType(type:StatisticsType): StatisticItem {
+private fun List<StatisticItem>.getItemByType(type: StatisticsType): StatisticItem {
     return this.find { it.type == type } ?: throw IllegalStateException("Unknown type")
 }
 

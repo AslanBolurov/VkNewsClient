@@ -1,7 +1,6 @@
 package com.sumincourse.vknewsclient.ui.theme
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -11,20 +10,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sumin.vknewsclient.ui.theme.PostCard
+import com.sumincourse.vknewsclient.MainViewModel
 import com.sumincourse.vknewsclient.domain.FeedPost
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: MainViewModel) {
+
+    val feedPost = viewModel.feedPost.observeAsState(FeedPost())
 
     val snackbarHostState = remember {
         SnackbarHostState()
@@ -32,10 +34,6 @@ fun MainScreen() {
     val scope = rememberCoroutineScope()
     val fabIsVisible = remember {
         mutableStateOf(true)
-    }
-
-    val feedPost = rememberSaveable {
-        mutableStateOf(FeedPost())
     }
 
     Scaffold(
@@ -94,19 +92,10 @@ fun MainScreen() {
         PostCard(
             modifier = Modifier.padding(8.dp),
             feedPost = feedPost.value,
-            onStatisticsItemClickListener = { newItem ->
-                val oldStatistics = feedPost.value.statistics
-                val newStatistics = oldStatistics.toMutableList().apply {
-                    replaceAll { oldItem ->
-                        if (oldItem.type == newItem.type) {
-                            oldItem.copy(count = oldItem.count + 1)
-                        } else {
-                            oldItem
-                        }
-                    }
-                }
-                feedPost.value = feedPost.value.copy(statistics = newStatistics)
-            }
+            onViewsClickListener = {viewModel.updateCount(it)},
+            onShareClickListener = viewModel::updateCount,
+            onLikeClickListener = {viewModel.updateCount(it)},
+            onCommentClickListener = viewModel::updateCount,
         )
     }
 }
