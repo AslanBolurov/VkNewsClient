@@ -21,7 +21,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sumincourse.vknewsclient.MainViewModel
 import com.sumincourse.vknewsclient.navigation.AppNavGraph
+import com.sumincourse.vknewsclient.navigation.NavigationState
 import com.sumincourse.vknewsclient.navigation.Screen
+import com.sumincourse.vknewsclient.navigation.rememberNavigationState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
@@ -29,7 +31,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
 
-    val navHostController = rememberNavController()
+    val navigateState = rememberNavigationState()
+
 
     val snackbarHostState = remember {
         SnackbarHostState()
@@ -64,7 +67,7 @@ fun MainScreen(viewModel: MainViewModel) {
         },
         bottomBar = {
             BottomNavigation {
-                val navBackStackEntry by navHostController.currentBackStackEntryAsState()
+                val navBackStackEntry by navigateState.navHostController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 val items = listOf(
@@ -75,15 +78,7 @@ fun MainScreen(viewModel: MainViewModel) {
                 items.forEach { item ->
                     BottomNavigationItem(
                         selected = currentRoute == item.screen.route,
-                        onClick = {
-                            navHostController.navigate(item.screen.route) {
-                                popUpTo(Screen.NewsFeed.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
+                        onClick = { navigateState.navigateTo(item.screen.route) },
                         icon = {
                             Icon(item.icon, contentDescription = null)
                         },
@@ -98,7 +93,7 @@ fun MainScreen(viewModel: MainViewModel) {
         }
     ) { paddingValues ->
         AppNavGraph(
-            navHostController = navHostController,
+            navHostController = navigateState.navHostController,
             homeScreenContent = {
                 HomeScreen(
                     viewModel = viewModel,
