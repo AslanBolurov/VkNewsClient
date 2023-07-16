@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,21 +19,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.sumincourse.vknewsclient.MainViewModel
+import com.sumincourse.vknewsclient.NewsFeedViewModel
+import com.sumincourse.vknewsclient.domain.FeedPost
 import com.sumincourse.vknewsclient.navigation.AppNavGraph
-import com.sumincourse.vknewsclient.navigation.NavigationState
-import com.sumincourse.vknewsclient.navigation.Screen
 import com.sumincourse.vknewsclient.navigation.rememberNavigationState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MainScreen(viewModel: MainViewModel) {
+fun MainScreen() {
 
     val navigateState = rememberNavigationState()
-
+    val commentsToPost: MutableState<FeedPost?> = remember {
+        mutableStateOf(null)
+    }
 
     val snackbarHostState = remember {
         SnackbarHostState()
@@ -95,10 +96,18 @@ fun MainScreen(viewModel: MainViewModel) {
         AppNavGraph(
             navHostController = navigateState.navHostController,
             homeScreenContent = {
-                HomeScreen(
-                    viewModel = viewModel,
-                    paddingValues = paddingValues
-                )
+                if (commentsToPost.value == null ){
+                    HomeScreen(
+                        paddingValues = paddingValues,
+                        onCommentClickListener = {
+                            commentsToPost.value=it
+                        }
+                    )
+                }else{
+                    CommentsScreen {
+                        commentsToPost.value=null
+                    }
+                }
             },
             favouriteScreenContent = { TextCounter(name = "Favourite") },
             profileScreenContent = { TextCounter(name = "Profile") }

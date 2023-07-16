@@ -26,14 +26,14 @@ import com.sumincourse.vknewsclient.ui.theme.VkNewsClientTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel by viewModels<MainViewModel>()
+//    private val viewModel by viewModels<NewsFeedViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        val viewModel=ViewModelProvider(this)[MainViewModel::class.java]
         setContent {
             VkNewsClientTheme {
-                MainScreen(viewModel)
+                MainScreen()
             }
         }
     }
