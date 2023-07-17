@@ -18,58 +18,28 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.sumincourse.vknewsclient.NewsFeedViewModel
 import com.sumincourse.vknewsclient.domain.FeedPost
 import com.sumincourse.vknewsclient.navigation.AppNavGraph
+import com.sumincourse.vknewsclient.navigation.Screen
 import com.sumincourse.vknewsclient.navigation.rememberNavigationState
 import kotlinx.coroutines.launch
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainScreen() {
+    val navigationState = rememberNavigationState()
 
-    val navigateState = rememberNavigationState()
     val commentsToPost: MutableState<FeedPost?> = remember {
         mutableStateOf(null)
     }
 
-    val snackbarHostState = remember {
-        SnackbarHostState()
-    }
-    val scope = rememberCoroutineScope()
-    val fabIsVisible = remember {
-        mutableStateOf(true)
-    }
-
     Scaffold(
-        floatingActionButton = {
-            if (fabIsVisible.value) {
-                FloatingActionButton(
-                    onClick = {
-                        scope.launch {
-                            val action = snackbarHostState.showSnackbar(
-                                message = "Snackbar message",
-                                actionLabel = "Hide FAB",
-                                duration = SnackbarDuration.Long
-                            )
-                            if (action == SnackbarResult.ActionPerformed) {
-                                fabIsVisible.value = false
-                            }
-                        }
-                    }) {
-                    Icon(Icons.Filled.Favorite, contentDescription = null)
-                }
-            }
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
         bottomBar = {
             BottomNavigation {
-                val navBackStackEntry by navigateState.navHostController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
+                val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
 
                 val items = listOf(
                     NavigationItem.Home,
@@ -77,9 +47,18 @@ fun MainScreen() {
                     NavigationItem.Profile
                 )
                 items.forEach { item ->
+
+                    val selected = navBackStackEntry?.destination?.hierarchy?.any {
+                        it.route == item.screen.route
+                    } ?: false
+
                     BottomNavigationItem(
-                        selected = currentRoute == item.screen.route,
-                        onClick = { navigateState.navigateTo(item.screen.route) },
+                        selected = selected,
+                        onClick = {
+                            if (!selected) {
+                                navigationState.navigateTo(item.screen.route)
+                            }
+                        },
                         icon = {
                             Icon(item.icon, contentDescription = null)
                         },
@@ -94,21 +73,23 @@ fun MainScreen() {
         }
     ) { paddingValues ->
         AppNavGraph(
-            navHostController = navigateState.navHostController,
-            homeScreenContent = {
-                if (commentsToPost.value == null) {
-                    HomeScreen(
-                        paddingValues = paddingValues,
-                        onCommentClickListener = {
-                            commentsToPost.value = it
-                        }
-                    )
-                } else {
-                    CommentsScreen(
-                        onBackPressed = { commentsToPost.value = null },
-                        feedPost = commentsToPost.value!!
-                    )
-                }
+            navHostController = navigationState.navHostController,
+            newsFeedScreenContent = {
+                HomeScreen(
+                    paddingValues = paddingValues,
+                    onCommentClickListener = {
+                        commentsToPost.value = it
+                        navigationState.navigateToComments()
+                    }
+                )
+            },
+            commentsScreenContent = {
+                CommentsScreen(
+                    onBackPressed = {
+                        navigationState.navHostController.popBackStack()
+                    },
+                    feedPost = commentsToPost.value!!
+                )
             },
             favouriteScreenContent = { TextCounter(name = "Favourite") },
             profileScreenContent = { TextCounter(name = "Profile") }
