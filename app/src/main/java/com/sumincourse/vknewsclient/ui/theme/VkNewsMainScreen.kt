@@ -96,17 +96,18 @@ fun MainScreen() {
         AppNavGraph(
             navHostController = navigateState.navHostController,
             homeScreenContent = {
-                if (commentsToPost.value == null ){
+                if (commentsToPost.value == null) {
                     HomeScreen(
                         paddingValues = paddingValues,
                         onCommentClickListener = {
-                            commentsToPost.value=it
+                            commentsToPost.value = it
                         }
                     )
-                }else{
-                    CommentsScreen {
-                        commentsToPost.value=null
-                    }
+                } else {
+                    CommentsScreen(
+                        onBackPressed = { commentsToPost.value = null },
+                        feedPost = commentsToPost.value!!
+                    )
                 }
             },
             favouriteScreenContent = { TextCounter(name = "Favourite") },
