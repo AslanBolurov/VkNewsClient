@@ -15,15 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sumincourse.vknewsclient.ui.theme.VkNewsClientTheme
 import com.sumincourse.vknewsclient.R
 import com.sumincourse.vknewsclient.domain.FeedPost
 import com.sumincourse.vknewsclient.domain.StatisticItem
-import com.sumincourse.vknewsclient.domain.StatisticsType
+import com.sumincourse.vknewsclient.domain.StatisticType
 
 @Composable
 fun PostCard(
@@ -105,7 +102,7 @@ private fun Statistics(
         Row(
             modifier = Modifier.weight(1f)
         ) {
-            val viewsItem = statistics.getItemByType(StatisticsType.VIEWS)
+            val viewsItem = statistics.getItemByType(StatisticType.VIEWS)
             IconWithText(
                 iconResId = R.drawable.ic_views_count,
                 text = viewsItem.count.toString(),
@@ -116,21 +113,21 @@ private fun Statistics(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            val sharesItem = statistics.getItemByType(StatisticsType.SHARES)
+            val sharesItem = statistics.getItemByType(StatisticType.SHARES)
             IconWithText(
                 iconResId = R.drawable.ic_share,
                 text = sharesItem.count.toString(),
                 onItemClickListener = { onShareClickListener(sharesItem) }
             )
 
-            val commentsItem = statistics.getItemByType(StatisticsType.COMMENTS)
+            val commentsItem = statistics.getItemByType(StatisticType.COMMENTS)
             IconWithText(
                 iconResId = R.drawable.ic_comment,
                 text = commentsItem.count.toString(),
                 onItemClickListener = { onCommentClickListener(commentsItem) }
             )
 
-            val likesItem = statistics.getItemByType(StatisticsType.LIKES)
+            val likesItem = statistics.getItemByType(StatisticType.LIKES)
             IconWithText(
                 iconResId = R.drawable.ic_like,
                 text = likesItem.count.toString(),
@@ -140,7 +137,7 @@ private fun Statistics(
     }
 }
 
-private fun List<StatisticItem>.getItemByType(type: StatisticsType): StatisticItem {
+private fun List<StatisticItem>.getItemByType(type: StatisticType): StatisticItem {
     return this.find { it.type == type } ?: throw IllegalStateException("Unknown type")
 }
 
